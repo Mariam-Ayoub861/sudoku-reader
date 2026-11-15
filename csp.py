@@ -76,6 +76,23 @@ def revise(domains, x, y):
 
     return changed
 
+def ac3(domains):
+    queue = []
+    for x in domains:
+        for y in get_neighbours(x[0], x[1]):
+            queue.append((x, y))
+
+    while queue:
+        x, y = queue.pop(0)
+        if revise(domains, x, y):
+            if not domains[x]:
+                return False
+            for z in get_neighbours(x[0], x[1]):
+                if z != y:
+                    queue.append((z, x))
+
+    return True 
+
 
 counters = {"assignments": 0, "backtracks": 0}
 
@@ -175,3 +192,10 @@ assert revise(t, (0, 0), (0, 1)) == False   # nothing left to remove
 
 t2 = {(0, 0): {1, 2}, (0, 1): {1, 2}}
 assert revise(t2, (0, 0), (0, 1)) == False  # both can still differ
+
+dd = init_domains(grid)
+assert ac3(dd) == True            # the normal puzzle has no conflict
+
+bad = [row[:] for row in grid]
+bad[0][2] = 5                     # a second 5 in row 0, next to the given 5
+assert ac3(init_domains(bad)) == False
