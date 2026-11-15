@@ -66,6 +66,16 @@ def forward_check(grid, domains, r, c, digit):
 
     return new
 
+def revise(domains, x, y):
+    changed = False
+
+    for v in list(domains[x]):
+        if not any(w != v for w in domains[y]):
+            domains[x].remove(v)
+            changed = True
+
+    return changed
+
 
 counters = {"assignments": 0, "backtracks": 0}
 
@@ -157,3 +167,11 @@ for fc in (False, True):
     res = solve(g, init_domains(g), use_fc=fc)
     assert res[0] == [5, 3, 4, 6, 7, 8, 9, 1, 2]
     print("FC =", fc, counters)
+
+t = {(0, 0): {1, 2}, (0, 1): {1}}
+assert revise(t, (0, 0), (0, 1)) == True
+assert t[(0, 0)] == {2}
+assert revise(t, (0, 0), (0, 1)) == False   # nothing left to remove
+
+t2 = {(0, 0): {1, 2}, (0, 1): {1, 2}}
+assert revise(t2, (0, 0), (0, 1)) == False  # both can still differ
