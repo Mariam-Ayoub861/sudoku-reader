@@ -1,0 +1,10 @@
+Neural network (sklearn MLPClassifier, 1 hidden layer of 128, 30 epochs, seed 42)
+  val  accuracy=0.9779  ECE=0.0098
+  test accuracy=0.9793  ECE=0.0088
+
+Baseline: logistic regression (max_iter=200)
+  val  accuracy=0.9160  ECE=0.0044
+  test accuracy=0.9251  ECE=0.0052
+
+Data: MNIST digits 1-9 only. train 44077 / val 10000 / test 9020.
+Note: both models hit the iteration limit (ConvergenceWarning).
