@@ -70,7 +70,7 @@ def forward_check(grid, domains, r, c, digit):
 counters = {"assignments": 0, "backtracks": 0}
 
 
-def solve(grid, domains):
+def solve(grid, domains, use_fc=False):
     cell = pick_cell(grid, domains)
 
     if cell is None:
@@ -80,10 +80,17 @@ def solve(grid, domains):
 
     for digit in domains[cell]:
         if is_consistent(grid, r, c, digit):
+            if use_fc:
+                new_domains = forward_check(grid, domains, r, c, digit)
+                if new_domains is None:
+                    continue
+            else:
+                new_domains = domains
+
             grid[r][c] = digit
             counters["assignments"] += 1
 
-            result = solve(grid, domains)
+            result = solve(grid, new_domains, use_fc)
 
             if result is not None:
                 return result
@@ -142,3 +149,11 @@ new = forward_check(grid, d, 0, 2, 2)
 assert new is not None
 assert 2 not in new[(0, 3)]
 assert 2 in d[(0, 3)]
+
+for fc in (False, True):
+    counters["assignments"] = 0
+    counters["backtracks"] = 0
+    g = [row[:] for row in grid]
+    res = solve(g, init_domains(g), use_fc=fc)
+    assert res[0] == [5, 3, 4, 6, 7, 8, 9, 1, 2]
+    print("FC =", fc, counters)
