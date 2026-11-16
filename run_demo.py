@@ -43,6 +43,7 @@ def main():
     ap.add_argument("--givens", type=int, default=30)
     ap.add_argument("--misreads", type=int, default=2)
     ap.add_argument("--no-nn", action="store_true", help="skip the NN-guided correction step")
+    ap.add_argument("--max-corr", type=int, default=2)
     args = ap.parse_args()
 
     nn, x_test, y_test = load_all()
@@ -66,12 +67,12 @@ def main():
         return
 
     print("3) SEARCH (UCS) over corrections, goal test = CSP (AC-3 + BT + FC):")
-    res = search(read, probs, "ucs")
+    res = search(read, probs, "ucs", max_corr=args.max_corr)
     if res is None:
         print("   UNREADABLE. Least confident cells:", least_confident(probs))
         fig, ax = plt.subplots(figsize=(5, 5))
         draw(ax, read, "Unreadable puzzle", {c: "red" for c in wrong})
-        fig.savefig("demo.png", dpi=120, bbox_inches="tight")
+        fig.savefig(f"demo_seed{args.seed}_m{args.misreads}.png", dpi=120, bbox_inches="tight")
         return
 
     for cell, old, new, cost in res["corrections"]:
@@ -88,8 +89,8 @@ def main():
     draw(axes[1], corrected, "2. After search corrections (green)", {c: "green" for c in fixed})
     filled = {(r, c): "tab:blue" for r in range(9) for c in range(9) if corrected[r][c] == 0}
     draw(axes[2], res["solution"], "3. CSP solution (blue = filled by CSP)", filled)
-    fig.savefig("demo.png", dpi=120, bbox_inches="tight")
-    print("plot saved to demo.png")
+    fig.savefig(f"demo_seed{args.seed}_m{args.misreads}.png", dpi=120, bbox_inches="tight")
+    print("plot saved")
 
 
 if __name__ == "__main__":

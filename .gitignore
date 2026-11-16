@@ -1,3 +1,7 @@
 venv/
 data/
 __pycache__/
+
+# Submission archives and generated logs
+*.zip
+git_log.txt
